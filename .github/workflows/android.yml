@@ -19,25 +19,20 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Make gradlew executable
-      run: |
-        if [ -f "android/gradlew" ]; then
-          chmod +x android/gradlew
-        elif [ -f "gradlew" ]; then
-          chmod +x gradlew
-        fi
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v3
 
-    - name: Build APK
+    - name: Build APK with System Gradle
       run: |
-        if [ -d "android" ]; then
-          cd android
-        fi
-        ./gradlew assembleDebug --stacktrace
+        cd android
+        gradle assembleDebug --stacktrace
+
+    - name: Check if APK is created
+      run: |
+        ls -la android/app/build/outputs/apk/debug/
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
         name: app-debug
-        path: |
-          android/app/build/outputs/apk/debug/app-debug.apk
-          app/build/outputs/apk/debug/app-debug.apk
+        path: android/app/build/outputs/apk/debug/app-debug.apk
