@@ -22,12 +22,13 @@ jobs:
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v3
 
-    - name: Build APK
+    - name: Build APK with Gradle
       run: |
-        if [ -d "android" ]; then
-          cd android
+        if [ -f "android/settings.gradle.kts" ] || [ -f "android/settings.gradle" ]; then
+          gradle -p android assembleDebug --stacktrace
+        else
+          gradle assembleDebug --stacktrace
         fi
-        gradle assembleDebug --stacktrace
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
