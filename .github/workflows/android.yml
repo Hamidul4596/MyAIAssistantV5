@@ -1,1 +1,46 @@
+name: Build Android APK
 
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'android/**'
+      - 'backend/**'
+      - '*.zip'
+      - '.github/workflows/android.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Unzip project if a zip is present at repo root
+        run: |
+          shopt -s nullglob
+          zips=(*.zip)
+          if [ ${#zips[@]} -gt 0 ]; then
+            echo "Found ${zips[0]}, extracting..."
+            unzip -o "${zips[0]}" -d .
+          else
+            echo "No zip found at repo root, assuming files are already unpacked."
+          fi
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.13'
+
+      - name: Build debug APK
+        working-directory: android
+        run: gradle assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: MyAIAssistant-V4-debug
+          path: android/app/build/outputs/apk/debug/app-debug.apk
