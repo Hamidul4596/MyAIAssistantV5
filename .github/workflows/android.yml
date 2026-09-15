@@ -20,7 +20,7 @@ jobs:
 
     - name: Unzip project files
       run: |
-        unzip MyAIProject_fixed2.zip -d extracted_project
+        unzip MyAIAssistant_V4_fixed2.zip -d extracted_project
         echo "Contents of extracted project:"
         ls -la extracted_project
 
