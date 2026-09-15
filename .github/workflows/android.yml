@@ -1,46 +1,43 @@
 name: Build Android APK
 
 on:
-  workflow_dispatch:
   push:
-    paths:
-      - 'android/**'
-      - 'backend/**'
-      - '*.zip'
-      - '.github/workflows/android.yml'
+    branches: [ "main", "master" ]
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+    - name: Checkout Code
+      uses: actions/checkout@v4
 
-      - name: Unzip project if a zip is present at repo root
-        run: |
-          shopt -s nullglob
-          zips=(*.zip)
-          if [ ${#zips[@]} -gt 0 ]; then
-            echo "Found ${zips[0]}, extracting..."
-            unzip -o "${zips[0]}" -d .
-          else
-            echo "No zip found at repo root, assuming files are already unpacked."
-          fi
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
 
-      - uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
+    - name: Make gradlew executable
+      run: |
+        if [ -f "android/gradlew" ]; then
+          chmod +x android/gradlew
+        elif [ -f "gradlew" ]; then
+          chmod +x gradlew
+        fi
 
-      - uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '8.13'
+    - name: Build APK
+      run: |
+        if [ -d "android" ]; then
+          cd android
+        fi
+        ./gradlew assembleDebug --stacktrace
 
-      - name: Build debug APK
-        working-directory: android
-        run: gradle assembleDebug
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: MyAIAssistant-V4-debug
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-debug
+        path: |
+          android/app/build/outputs/apk/debug/app-debug.apk
+          app/build/outputs/apk/debug/app-debug.apk
