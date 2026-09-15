@@ -1,0 +1,3 @@
+<resources>
+<style name="Theme.MyAIAssistantV4" parent="android:style/Theme.Material.Light.NoActionBar"/>
+</resources>
