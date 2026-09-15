@@ -34,6 +34,6 @@ jobs:
           gradle-version: '8.13'
 
       - name: Build debug APK
-        working-directory: working-directory: myaia/android
+        working-directory: myaia/android
         run: gradle assembleDebug -Pandroid.injected.build.model.only.versioned=3 -Dorg.gradle.jvmargs="-Xmx2048m" -Pkotlin.compiler.jvmTarget=1.8
         
