@@ -18,18 +18,39 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
+    - name: Unzip project files
+      run: |
+        unzip MyAIProject_fixed2.zip -d extracted_project
+        echo "Contents of extracted project:"
+        ls -la extracted_project
+
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v3
 
     - name: Make gradlew executable
-      run: chmod +x gradlew
+      run: |
+        if [ -f "extracted_project/gradlew" ]; then
+          chmod +x extracted_project/gradlew
+        elif [ -f "extracted_project/android/gradlew" ]; then
+          chmod +x extracted_project/android/gradlew
+        fi
 
     - name: Build APK
-      run: ./gradlew assembleDebug
+      run: |
+        if [ -f "extracted_project/gradlew" ]; then
+          cd extracted_project && ./gradlew assembleDebug
+        elif [ -f "extracted_project/android/gradlew" ]; then
+          cd extracted_project/android && ./gradlew assembleDebug
+        else
+          echo "gradlew file not found!"
+          exit 1
+        fi
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
         name: app-debug
-        path: app/build/outputs/apk/debug/app-debug.apk
-        
+        path: |
+          extracted_project/app/build/outputs/apk/debug/app-debug.apk
+          extracted_project/android/app/build/outputs/apk/debug/app-debug.apk
+          
