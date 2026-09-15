@@ -35,11 +35,5 @@ jobs:
 
       - name: Build debug APK
         working-directory: android
-        run: gradle assembleDebug -Dorg.gradle.java.home=$JAVA_HOME -Pkotlin.compiler.jvmTarget=17
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: MyAIAssistant-V4-debug
-          path: android/app/build/outputs/apk/debug/app-debug.apk
-          
+        run: gradle assembleDebug -Pandroid.injected.build.model.only.versioned=3 -Dorg.gradle.jvmargs="-Xmx2048m" -Pkotlin.compiler.jvmTarget=1.8
+        
